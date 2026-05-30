@@ -5,6 +5,6 @@ export default defineConfig({
   base: '/Online-Learning-Management-System/',
   plugins: [react()],
   build: {
-    outDir: 'docs',
+    outDir: '../docs',
   },
 })
