@@ -1,10 +1,22 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import Navbar from './components/navbar';
-import Footer from './components/footer';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './components/home';
 import Login from './components/login';
 import SignUp from './components/signup';
+import Courses from './components/courses';
+import CourseDetails from './components/coursedetails';
+import CourseViewer from './components/courseviewer';
+import Instructors from './components/instructors';
+import About from './components/about';
+import Contact from './components/contact';
+import Profile from './components/profile';
+import Privacy from './components/privacy';
+import Terms from './components/terms';
+import InstructorWorkspace from './components/instructorworkspace';
+import AdminWorkspace from './components/adminworkspace';
+import AccessibilityToolbar from './components/AccessibilityToolbar';
 import { courses as defaultCourses } from './data/coursesData';
 
 // Layout wrapper for pages containing the global Header and Footer
@@ -96,26 +108,27 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <AccessibilityToolbar />
       <Routes>
         {/* Main Website Shell */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<Navigate to="/" replace />} />
-          <Route path="/courses/:courseId" element={<Navigate to="/" replace />} />
-          <Route path="/instructors" element={<Navigate to="/" replace />} />
-          <Route path="/about" element={<Navigate to="/" replace />} />
-          <Route path="/contact" element={<Navigate to="/" replace />} />
-          <Route path="/profile" element={<Navigate to="/" replace />} />
-          <Route path="/instructor-workspace" element={<Navigate to="/" replace />} />
-          <Route path="/admin-workspace" element={<Navigate to="/" replace />} />
-          <Route path="/privacy" element={<Navigate to="/" replace />} />
-          <Route path="/terms" element={<Navigate to="/" replace />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route path="/instructors" element={<Instructors />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/instructor-workspace" element={<InstructorWorkspace />} />
+          <Route path="/admin-workspace" element={<AdminWorkspace />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
         </Route>
 
         {/* Standalone Pages without Global Header/Footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/courses/:courseId/learn" element={<Navigate to="/" replace />} />
+        <Route path="/courses/:courseId/learn" element={<CourseViewer />} />
 
         {/* Wildcard Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

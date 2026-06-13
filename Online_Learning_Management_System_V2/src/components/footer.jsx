@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Mail, Phone, MapPin, Send } from 'lucide-react';
-import './footer.css';
+import useTranslation from '../hooks/useTranslation';
+import './Footer.css';
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you for subscribing to our newsletter!');
+    alert(t('Newsletter Success'));
     e.target.reset();
   };
 
@@ -22,7 +25,7 @@ export default function Footer() {
             <span>EduSphere</span>
           </Link>
           <p className="footer-description">
-            Empowering learners worldwide through state-of-the-art virtual education, expert guidance, and interactive modern learning tools.
+            {t('Footer Brand Description')}
           </p>
           <div className="social-links">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-icon" aria-label="Facebook">
@@ -42,23 +45,23 @@ export default function Footer() {
 
         {/* Quick Links */}
         <div className="footer-column animate-fade-in">
-          <h3>Quick Links</h3>
+          <h3>{t('Quick Links')}</h3>
           <ul className="footer-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/courses">Courses</Link></li>
-            <li><Link to="/instructors">Instructors</Link></li>
-            <li><Link to="/about">About Us</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
+            <li><Link to="/">{t('Home Page')}</Link></li>
+            <li><Link to="/courses">{t('Browse Courses')}</Link></li>
+            <li><Link to="/instructors">{t('Our Instructors')}</Link></li>
+            <li><Link to="/about">{t('About Our LMS')}</Link></li>
+            <li><Link to="/contact">{t('Contact Support')}</Link></li>
           </ul>
         </div>
 
         {/* Contact Info */}
         <div className="footer-column animate-fade-in">
-          <h3>Contact Us</h3>
+          <h3>{t('Contact Us')}</h3>
           <ul className="contact-info">
             <li>
               <MapPin size={18} className="contact-icon" />
-              <span>100 Innovation Way, Tech Park, NY 10001</span>
+              <span>{t('100 Innovation Way, Tech Park, NY 10001')}</span>
             </li>
             <li>
               <Phone size={18} className="contact-icon" />
@@ -73,12 +76,12 @@ export default function Footer() {
 
         {/* Newsletter subscription */}
         <div className="footer-column footer-newsletter animate-fade-in">
-          <h3>Stay Updated</h3>
-          <p>Subscribe to our newsletter for the latest updates, courses, and educational trends.</p>
+          <h3>{t('Stay Updated')}</h3>
+          <p>{t('Newsletter Sub Description')}</p>
           <form className="newsletter-form" onSubmit={handleSubmit}>
             <input 
               type="email" 
-              placeholder="Your email address" 
+              placeholder={t('Your email address')} 
               required 
               className="newsletter-input" 
             />
@@ -92,10 +95,10 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="footer-bottom">
         <div className="container footer-bottom-container">
-          <p>&copy; {new Date().getFullYear()} EduSphere LMS. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} EduSphere LMS. {t('All rights reserved.')}</p>
           <div className="footer-bottom-links">
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
+            <Link to="/privacy">{t('Privacy Policy')}</Link>
+            <Link to="/terms">{t('Terms of Service')}</Link>
           </div>
         </div>
       </div>

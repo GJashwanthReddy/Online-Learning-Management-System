@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Menu, X, LogOut } from 'lucide-react';
-import './navbar.css';
+import { BookOpen, Menu, X, LogOut, User } from 'lucide-react';
+import useTranslation from '../hooks/useTranslation';
+import './Navbar.css';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [activeRole, setActiveRole] = useState(localStorage.getItem('activeRole') || 'student');
+  const { t } = useTranslation();
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ export default function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  // Check login and role states whenever user navigates or makes updates
   useEffect(() => {
     const checkState = () => {
       const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -21,6 +25,7 @@ export default function Navbar() {
       if (loggedIn) {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
         setUser(userData);
+        setActiveRole(localStorage.getItem('activeRole') || userData.role || 'student');
       } else {
         setUser(null);
       }
@@ -44,6 +49,30 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleRoleChange = (e) => {
+    const newRole = e.target.value;
+    setActiveRole(newRole);
+    localStorage.setItem('activeRole', newRole);
+    
+    // Update user object role in storage for consistency
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    userData.role = newRole;
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    window.dispatchEvent(new Event('storage'));
+    
+    closeMenu();
+    
+    // Redirect based on selected role workspace
+    if (newRole === 'instructor') {
+      navigate('/instructor-workspace');
+    } else if (newRole === 'admin') {
+      navigate('/admin-workspace');
+    } else {
+      navigate('/profile');
+    }
+  };
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Courses', path: '/courses' },
@@ -55,7 +84,13 @@ export default function Navbar() {
   const getNavLinks = () => {
     const baseLinks = [...navLinks];
     if (isLoggedIn) {
-      baseLinks.splice(1, 0, { name: 'Student Dashboard', path: '/profile' });
+      if (activeRole === 'instructor') {
+        baseLinks.splice(1, 0, { name: 'Instructor Workspace', path: '/instructor-workspace' });
+      } else if (activeRole === 'admin') {
+        baseLinks.splice(1, 0, { name: 'Admin Workspace', path: '/admin-workspace' });
+      } else {
+        baseLinks.splice(1, 0, { name: 'Student Dashboard', path: '/profile' });
+      }
     }
     return baseLinks;
   };
@@ -92,31 +127,47 @@ export default function Navbar() {
               to={link.path}
               className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
             >
-              {link.name}
+              {t(link.name)}
             </Link>
           ))}
         </div>
 
         <div className="navbar-actions">
+          {isLoggedIn && (
+            <div className="role-switcher-nav">
+              <span className="role-switcher-label">{t('Role:')}</span>
+              <select
+                value={activeRole}
+                onChange={handleRoleChange}
+                className="navbar-role-select"
+                aria-label="Toggle active workspace role"
+              >
+                <option value="student">{t('Student')}</option>
+                <option value="instructor">{t('Instructor')}</option>
+                <option value="admin">{t('Admin')}</option>
+              </select>
+            </div>
+          )}
+
           {isLoggedIn ? (
             <div className="user-profile-menu">
-              <div className="profile-link-wrap" title="Student Profile (Dashboard Disabled)">
+              <Link to="/profile" className="profile-link-wrap" title={t('Go to Dashboard')}>
                 <div className="profile-badge">
                   {getInitials(user?.name)}
                 </div>
                 <span className="profile-name">{user?.name?.split(' ')[0] || 'Student'}</span>
-              </div>
-              <button onClick={handleLogout} className="btn btn-secondary logout-btn" title="Log Out">
-                <LogOut size={16} /> Log Out
+              </Link>
+              <button onClick={handleLogout} className="btn btn-secondary logout-btn" title={t('Log Out')}>
+                <LogOut size={16} /> {t('Log Out')}
               </button>
             </div>
           ) : (
             <>
               <Link to="/login" className="btn btn-secondary nav-btn">
-                Log In
+                {t('Log In')}
               </Link>
               <Link to="/signup" className="btn btn-primary nav-btn">
-                Get Started
+                {t('Get Started')}
               </Link>
             </>
           )}
@@ -138,32 +189,48 @@ export default function Navbar() {
               className={`mobile-nav-link ${isActive(link.path) ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              {link.name}
+              {t(link.name)}
             </Link>
           ))}
           <div className="mobile-drawer-actions">
             {isLoggedIn ? (
               <div className="mobile-profile-wrapper">
-                <div className="mobile-profile-info">
-                  <div className="profile-badge">
-                    {getInitials(user?.name)}
-                  </div>
-                  <div>
-                    <h4 className="mobile-user-name">{user?.name || 'Student'}</h4>
-                    <span className="mobile-user-email">{user?.email || ''}</span>
-                  </div>
+                <div className="role-switcher-nav" style={{ justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span className="role-switcher-label">{t('Role:')}</span>
+                  <select
+                    value={activeRole}
+                    onChange={handleRoleChange}
+                    className="navbar-role-select"
+                    aria-label="Toggle active workspace role"
+                  >
+                    <option value="student">{t('Student')}</option>
+                    <option value="instructor">{t('Instructor')}</option>
+                    <option value="admin">{t('Admin')}</option>
+                  </select>
                 </div>
+
+                <Link to="/profile" className="mobile-profile-info-link" onClick={closeMenu}>
+                  <div className="mobile-profile-info">
+                    <div className="profile-badge">
+                      {getInitials(user?.name)}
+                    </div>
+                    <div>
+                      <h4 className="mobile-user-name">{user?.name || 'Student'}</h4>
+                      <span className="mobile-user-email">{user?.email || ''}</span>
+                    </div>
+                  </div>
+                </Link>
                 <button onClick={handleLogout} className="btn btn-secondary btn-full logout-btn">
-                  <LogOut size={16} /> Log Out
+                  <LogOut size={16} /> {t('Log Out')}
                 </button>
               </div>
             ) : (
               <>
                 <Link to="/login" className="btn btn-secondary btn-full" onClick={closeMenu}>
-                  Log In
+                  {t('Log In')}
                 </Link>
                 <Link to="/signup" className="btn btn-primary btn-full" onClick={closeMenu}>
-                  Get Started
+                  {t('Get Started')}
                 </Link>
               </>
             )}
